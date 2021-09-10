@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -12,15 +12,25 @@ protocol.registerSchemesAsPrivileged([
 
 async function createWindow() {
   // Create the browser window.
+  // 隐藏菜单栏
+  // Menu.setApplicationMenu(null)
   const win = new BrowserWindow({
     width: 800,
     height: 600,
+    // 窗口无边框
+    frame: false,
+    titleBarStyle: 'hidden',
+    transparent: true,
+    // win7系统电脑gpu问题 在主进程加上app.disableHardwareAcceleration()
     webPreferences: {
-      
+      // allowRunningInsecureContent:true,
+      webSecurity: false,
+      // Required for Spectron testing
+      enableRemoteModule: true,
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       nodeIntegration: (process.env
-          .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
+        .ELECTRON_NODE_INTEGRATION as unknown) as boolean,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
     }
   })
@@ -34,6 +44,22 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  //登录窗口最小化
+  ipcMain.on('window-min', function () {
+    win.minimize();
+  });
+  //登录窗口最大化
+  ipcMain.on('window-max', function () {
+    if (win.isMaximized()) {
+      win.restore();
+    } else {
+      win.maximize();
+    }
+  });
+  ipcMain.on('window-close', function () {
+    win.close();
+  });
 }
 
 // Quit when all windows are closed.
