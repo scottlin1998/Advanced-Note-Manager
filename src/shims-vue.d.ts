@@ -4,3 +4,11 @@ declare module '*.vue' {
   const component: ComponentOptions
   export default component
 }
+
+declare interface Window {
+  bridge: {
+    minimize: () => void,
+    toggleMaximize: () => void,
+    closeApp: () => void
+  }
+}

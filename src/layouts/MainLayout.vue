@@ -1,117 +1,151 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
+<q-layout view="hHh lpR fFf">
+    <q-header style="-webkit-app-region: drag;">
+        <q-bar>
+            <q-btn dense flat :icon="leftDrawerOpen?'menu_open':'menu'" @click="toggleLeftDrawer" style="-webkit-app-region: no-drag;" />
+            <div>高级笔记管理</div>
 
-        <q-toolbar-title>
-          Quasar App
-        </q-toolbar-title>
+            <q-space />
 
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
+            <q-btn dense flat icon="minimize" @click="minimize" style="-webkit-app-region: no-drag;" />
+            <q-btn dense flat icon="crop_square" @click="toggleMaximize" style="-webkit-app-region: no-drag;" />
+            <q-btn dense flat icon="close" @click="closeApp" style="-webkit-app-region: no-drag;" />
+        </q-bar>
     </q-header>
 
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
+    <q-drawer v-model="leftDrawerOpen" show-if-above bordered :width="200">
+        <q-img src="https://cdn.quasar.dev/img/material.png" style="height: 150px">
+            <div class="absolute-bottom bg-transparent">
+                <q-avatar size="56px" class="q-mb-sm">
+                    <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+                </q-avatar>
+                <div class="text-weight-bold">Razvan Stoenescu</div>
+                <div>@rstoenescu</div>
+            </div>
+        </q-img>
+        <q-list padding>
+            <q-item clickable v-ripple>
+                <q-item-section avatar>
+                    <q-icon name="home" />
+                </q-item-section>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+                <q-item-section>
+                    主页
+                </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+                <q-item-section avatar>
+                    <q-icon name="folder" />
+                </q-item-section>
+
+                <q-item-section>
+                    管理
+                </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+                <q-item-section avatar>
+                    <q-icon name="archive" />
+                </q-item-section>
+
+                <q-item-section>
+
+                    存档
+                </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+                <q-item-section avatar>
+                    <q-icon name="analytics" />
+                </q-item-section>
+
+                <q-item-section>
+                    统计
+                </q-item-section>
+            </q-item>
+
+            <q-separator spaced />
+
+            <q-item clickable v-ripple>
+                <q-item-section avatar>
+                    <q-icon name="settings" />
+                </q-item-section>
+
+                <q-item-section>
+                    设置
+                </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+                <q-item-section avatar>
+                    <q-icon name="money" />
+                </q-item-section>
+
+                <q-item-section>
+                    捐赠
+                </q-item-section>
+            </q-item>
+
+            <q-item clickable v-ripple>
+                <q-item-section avatar>
+                    <q-icon name="info" />
+                </q-item-section>
+
+                <q-item-section>
+                    关于
+                </q-item-section>
+            </q-item>
+        </q-list>
+
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+        <router-view />
     </q-page-container>
-  </q-layout>
+</q-layout>
 </template>
 
 <script lang="ts">
-import EssentialLink from 'components/EssentialLink.vue'
-
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-];
-
-import { defineComponent, ref } from 'vue'
+import {
+    defineComponent,
+    ref
+} from 'vue'
 
 export default defineComponent({
-  name: 'MainLayout',
+    name: 'MainLayout',
 
-  components: {
-    EssentialLink
-  },
+    setup() {
+        const leftDrawerOpen = ref(true)
 
-  setup () {
-    const leftDrawerOpen = ref(false)
+        function minimize() {
+            if (process.env.MODE === 'electron') {
+                window.bridge.minimize();
+            }
+        }
 
-    return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
+        function toggleMaximize() {
+            if (process.env.MODE === 'electron') {
+                window.bridge.toggleMaximize()
+            }
+        }
+
+        function closeApp() {
+            if (process.env.MODE === 'electron') {
+                window.bridge.closeApp()
+            }
+        }
+
+        return {
+            leftDrawerOpen,
+            minimize,
+            toggleMaximize,
+            closeApp,
+            toggleLeftDrawer() {
+                leftDrawerOpen.value = !leftDrawerOpen.value
+            }
+
+        }
     }
-  }
 })
 </script>

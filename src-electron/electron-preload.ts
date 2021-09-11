@@ -15,3 +15,9 @@
  *     doAThing: () => {}
  *   })
  */
+import { contextBridge, ipcRenderer } from 'electron'
+contextBridge.exposeInMainWorld('bridge', {
+    minimize: () => ipcRenderer.send('window-minimize'),
+    toggleMaximize: () => ipcRenderer.send('window-toggleMaximize'),
+    closeApp: () => ipcRenderer.send('window-closeApp'),
+});
